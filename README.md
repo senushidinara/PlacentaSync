@@ -13,10 +13,8 @@
 
 <p>
   <a href="https://github.com/senushidinara/PlacentaSync"><img src="https://img.shields.io/badge/Source%20code-GitHub-2F6260?style=for-the-badge&logo=github&logoColor=white" alt="Source code"></a>
-  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/senushidinara/PlacentaSync"><img src="https://img.shields.io/badge/Deploy-Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" alt="Deploy to Netlify"></a>
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=20232A" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Netlify-ready-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" alt="Netlify ready">
 </p>
 
 <p>
@@ -24,7 +22,6 @@
   <a href="#-the-care-loop">Care loop</a> ·
   <a href="#-features">Features</a> ·
   <a href="#-run-it">Run it</a> ·
-  <a href="#-deploy-to-netlify">Deploy</a> ·
   <a href="#-faq">FAQ</a>
 </p>
 
@@ -38,6 +35,12 @@
 
 <p align="center">
   <img src="./public/placenta-sync-live.png" alt="PlacentaSync Today screen screenshot" width="900">
+</p>
+
+<p align="center">
+  <a href="https://6aec42d2b1ff41fd8e61c97f--earnest-speculoos-a3c583.netlify.app/">
+    <img src="https://img.shields.io/badge/Try%20it%20out-Live%20demo-2F6260?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Try PlacentaSync live">
+  </a>
 </p>
 
 <p align="center">
@@ -145,8 +148,7 @@ flowchart LR
   🟦 TypeScript &nbsp;·&nbsp;
   ⚡ Vite &nbsp;·&nbsp;
   🎨 Tailwind CSS &nbsp;·&nbsp;
-  🧩 Lucide React &nbsp;·&nbsp;
-  🌐 Netlify
+  🧩 Lucide React
 </p>
 
 This is a **standalone client-only prototype**. It does not depend on the original Embrayo project and does not require Firebase, PostgreSQL, Gemini, or an Express server.
@@ -184,27 +186,17 @@ npm run preview
 
 </details>
 
-## 🌐 Deploy to Netlify
+## 🚀 Try it out
 
-### One-click deploy
+Experience the live PlacentaSync prototype here:
 
-<p>
-  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/senushidinara/PlacentaSync">
-    <img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy PlacentaSync to Netlify">
+<p align="center">
+  <a href="https://6aec42d2b1ff41fd8e61c97f--earnest-speculoos-a3c583.netlify.app/">
+    <strong>🌿 Open the live PlacentaSync demo →</strong>
   </a>
 </p>
 
-### Manual settings
-
-The repository already includes `netlify.toml`, so Netlify can use the defaults:
-
-| Setting | Value |
-| --- | --- |
-| 🔨 Build command | `npm run build` |
-| 📁 Publish directory | `dist` |
-| 🔁 SPA fallback | `/* → /index.html` |
-
-> 🚀 A verified Netlify site has not been connected to this repository yet, so there is no live-app URL to publish here. Use the deploy button above and Netlify will generate the direct URL for your site.
+> The live demo is a client-only prototype. For the best experience, open it on a phone-sized screen or in a modern mobile browser.
 
 ## 📲 Care access and booking
 
@@ -248,7 +240,6 @@ The Sessions tab lets someone:
 
 - [x] TypeScript validation with `npm run lint`
 - [x] Production Vite build with `npm run build`
-- [x] Netlify SPA redirect configured
 - [x] Mobile-first responsive layout
 - [x] No copied Embrayo runtime dependencies
 - [x] No external health-data service required for the prototype
@@ -296,10 +287,10 @@ The current prototype uses a focused set of mood and symptom options. The UI is 
 </details>
 
 <details>
-<summary><strong>Why is there no live link yet?</strong></summary>
+<summary><strong>Where can I try PlacentaSync?</strong></summary>
 <br>
 
-The GitHub repository is Netlify-ready, but no verified Netlify site has been linked to it yet. Deploy it with the button above, then add the generated URL to the top of this README.
+The live prototype is available at the [PlacentaSync demo](https://6aec42d2b1ff41fd8e61c97f--earnest-speculoos-a3c583.netlify.app/).
 
 </details>
 
