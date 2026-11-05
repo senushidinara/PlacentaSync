@@ -1,0 +1,156 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common Security Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // ==========================================
+    // Entity 1: Study Notes Validation
+    // ==========================================
+    function isValidStudyNote(data, expectedUserId) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == expectedUserId && data.userId == request.auth.uid &&
+             data.stageId is string && data.stageId.size() > 0 && data.stageId.size() <= 64 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.content is string && data.content.size() >= 1 && data.content.size() <= 3000 &&
+             (!('tag' in data) || (data.tag is string && data.tag.size() <= 40)) &&
+             (!('structureId' in data) || (data.structureId is string && data.structureId.size() <= 64)) &&
+             data.createdAt is string && data.createdAt.size() <= 40 &&
+             data.updatedAt is string && data.updatedAt.size() <= 40;
+    }
+
+    // ==========================================
+    // Entity 2: Custom Presets Validation
+    // ==========================================
+    function isValidCustomPreset(data, expectedUserId) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == expectedUserId && data.userId == request.auth.uid &&
+             data.stageId is string && data.stageId.size() > 0 && data.stageId.size() <= 64 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+             data.sliceAxis in ['none', 'x', 'y', 'z'] &&
+             data.slicePosition is number && data.slicePosition >= -2.0 && data.slicePosition <= 2.0 &&
+             data.explodedView is number && data.explodedView >= 0.0 && data.explodedView <= 3.0 &&
+             data.transparentOuterLayers is bool &&
+             data.showLabels is bool &&
+             data.autoRotate is bool &&
+             data.createdAt is string && data.createdAt.size() <= 40 &&
+             data.updatedAt is string && data.updatedAt.size() <= 40;
+    }
+
+    // ==========================================
+    // Entity 3: Stage Progress Validation
+    // ==========================================
+    function isValidStageProgress(data, expectedUserId) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == expectedUserId && data.userId == request.auth.uid &&
+             data.stageId is string && data.stageId.size() > 0 && data.stageId.size() <= 64 &&
+             data.isMastered is bool &&
+             data.quizScore is number && data.quizScore >= 0 && data.quizScore <= 100 &&
+             data.updatedAt is string && data.updatedAt.size() <= 40;
+    }
+
+    // ==========================================
+    // Entity 4: Discussion Post Validation
+    // ==========================================
+    function isValidDiscussionPost(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.authorId is string && data.authorId == request.auth.uid &&
+             data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 80 &&
+             data.stageId is string && data.stageId.size() > 0 && data.stageId.size() <= 64 &&
+             (!('structureName' in data) || (data.structureName is string && data.structureName.size() <= 80)) &&
+             data.content is string && data.content.size() >= 3 && data.content.size() <= 1000 &&
+             data.createdAt is string && data.createdAt.size() <= 40;
+    }
+
+    // ==========================================
+    // Collection Rules: /users/{userId}/...
+    // ==========================================
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      // Subcollection: Notes
+      match /notes/{noteId} {
+        allow get: if isOwner(userId) && isValidId(noteId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(noteId) &&
+                         isValidStudyNote(incoming(), userId) &&
+                         incoming().id == noteId;
+        allow update: if isOwner(userId) && isValidId(noteId) &&
+                         isValidStudyNote(incoming(), userId) &&
+                         incoming().id == existing().id &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt;
+        allow delete: if isOwner(userId) && isValidId(noteId);
+      }
+
+      // Subcollection: Presets
+      match /presets/{presetId} {
+        allow get: if isOwner(userId) && isValidId(presetId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(presetId) &&
+                         isValidCustomPreset(incoming(), userId) &&
+                         incoming().id == presetId;
+        allow update: if isOwner(userId) && isValidId(presetId) &&
+                         isValidCustomPreset(incoming(), userId) &&
+                         incoming().id == existing().id &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt;
+        allow delete: if isOwner(userId) && isValidId(presetId);
+      }
+
+      // Subcollection: Progress
+      match /progress/{stageId} {
+        allow get: if isOwner(userId) && isValidId(stageId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(stageId) &&
+                         isValidStageProgress(incoming(), userId) &&
+                         incoming().id == stageId &&
+                         incoming().stageId == stageId;
+        allow update: if isOwner(userId) && isValidId(stageId) &&
+                         isValidStageProgress(incoming(), userId) &&
+                         incoming().id == existing().id &&
+                         incoming().stageId == existing().stageId &&
+                         incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(stageId);
+      }
+    }
+
+    // ==========================================
+    // Collection Rules: /discussions/{discussionId}
+    // ==========================================
+    match /discussions/{discussionId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(discussionId) &&
+                       isValidDiscussionPost(incoming()) &&
+                       incoming().id == discussionId;
+      allow update: if false; // Posts are immutable once published to preserve thread integrity
+      allow delete: if isSignedIn() && isValidId(discussionId) &&
+                       existing().authorId == request.auth.uid;
+    }
+  }
+}
