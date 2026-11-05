@@ -1,6 +1,0 @@
-{
-  "name": "3D Embryo Explorer",
-  "description": "An interactive 3D human embryology visualizer mapping weeks 1 to 4 of development, featuring real-time cross-section slicing, interactive germ layer tracking, Firebase cloud-synced study notes, custom view presets, and peer discussion.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
