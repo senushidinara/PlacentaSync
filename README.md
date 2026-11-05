@@ -8,6 +8,9 @@
   A calm, mobile-first maternal care companion for noticing, breathing, and reaching out.
 </p>
 
+> 🌐 **Repository:** [github.com/senushidinara/PlacentaSync](https://github.com/senushidinara/PlacentaSync)
+> 💬 **Care WhatsApp:** [+94 77 795 9386](https://wa.me/94777959386)
+
 <p>
   <a href="https://github.com/senushidinara/PlacentaSync"><img src="https://img.shields.io/badge/Source%20code-GitHub-2F6260?style=for-the-badge&logo=github&logoColor=white" alt="Source code"></a>
   <a href="https://app.netlify.com/start/deploy?repository=https://github.com/senushidinara/PlacentaSync"><img src="https://img.shields.io/badge/Deploy-Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" alt="Deploy to Netlify"></a>
@@ -30,6 +33,30 @@
 <p align="center">
   <img src="./public/placenta-sync-preview.svg" alt="PlacentaSync app preview" width="920">
 </p>
+
+## 📸 See it in action
+
+<p align="center">
+  <img src="./public/placenta-sync-live.png" alt="PlacentaSync Today screen screenshot" width="900">
+</p>
+
+<p align="center">
+  <img src="./public/placenta-sync-explore.png" alt="PlacentaSync nearby care and nutrition access screen screenshot" width="900">
+</p>
+
+<details>
+<summary><strong>🖼️ Screenshot gallery</strong></summary>
+<br>
+
+| Screen | What to try |
+| --- | --- |
+| 🌤️ Today | Mood, symptom, breathing, nearby-care, booking, and urgent-help actions |
+| 📚 Learn | Expand maternal education lessons and mark them as learned |
+| 📍 Explore | Open nearby map searches for maternity hospitals, clinics, and nutrition shops |
+| 🗓️ Sessions | Select a session, date, and time, then hand off booking/payment through WhatsApp |
+| 💬 Care team | Open WhatsApp, call the care number, or save a message |
+
+</details>
 
 <details open>
 <summary><strong>🌼 The short version</strong></summary>
@@ -67,6 +94,12 @@ The interface turns that question into a simple loop:
 | 💬 **Care team** | Make support and communication easy to find. |
 | ☎️ **Urgent help** | Keep escalation guidance visible when something feels wrong. |
 | 📱 **Responsive UI** | Designed for phones first, then expanded for larger screens. |
+| 📍 **Nearby care access** | Open map searches for maternity hospitals, women’s clinics, and nutrition shops. |
+| 🥗 **Nutrition delivery** | Find nearby supplement and healthy-food delivery options with safety reminders. |
+| 💬 **Direct WhatsApp** | Start a pre-filled conversation with the care team at **+94 77 795 9386**. |
+| 🗓️ **Session calendar** | Choose a maternal education topic, preferred date, and time. |
+| 💳 **Book & pay handoff** | Send the booking request to WhatsApp so the care team can confirm payment securely. |
+| 🎥 **Video-session handoff** | Ask the care team to confirm a secure Zoom/video link after booking. |
 
 <details>
 <summary><strong>🎨 Design details</strong></summary>
@@ -117,6 +150,8 @@ flowchart LR
 </p>
 
 This is a **standalone client-only prototype**. It does not depend on the original Embrayo project and does not require Firebase, PostgreSQL, Gemini, or an Express server.
+
+The app is intentionally built around **safe handoffs**: maps open trusted external search, WhatsApp opens the provided care number, and payment/video details are confirmed by the care team instead of collecting card details or inventing a meeting link inside the prototype.
 
 ## 💻 Run it
 
@@ -171,6 +206,44 @@ The repository already includes `netlify.toml`, so Netlify can use the defaults:
 
 > 🚀 A verified Netlify site has not been connected to this repository yet, so there is no live-app URL to publish here. Use the deploy button above and Netlify will generate the direct URL for your site.
 
+## 📲 Care access and booking
+
+### One-tap WhatsApp
+
+<a href="https://wa.me/94777959386?text=Hi%20PlacentaSync%20care%20team%2C%20I%20would%20like%20support%20with%3A%20">
+  <img src="https://img.shields.io/badge/Chat%20with%20care%20team-WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Chat with PlacentaSync care team on WhatsApp">
+</a>
+
+The Care team tab includes:
+
+- 💬 A pre-filled WhatsApp handoff to **+94 77 795 9386**
+- 📞 A direct call action
+- 📝 A local message composer for preparing a question
+- 🔐 A clear note that urgent symptoms should not wait for messaging
+
+### Nearby support
+
+The Explore tab provides safe shortcuts to:
+
+- 🏥 Maternity hospitals
+- 🩺 Women’s health clinics
+- 🛍️ Pregnancy nutrition and supplement shops
+- 🚚 Healthy-food and supplement delivery searches
+
+The map actions use Google Maps search rather than pretending the prototype has a verified clinic directory. Results should be checked for opening hours, distance, and maternity capability.
+
+### Maternal education sessions
+
+The Sessions tab lets someone:
+
+1. Pick **Midwife check-in**, **Nutrition education**, or **Birth preparation**.
+2. Select a preferred date and time.
+3. Use **Book & pay via WhatsApp** to send the request to the care team.
+4. Receive payment instructions and a confirmed secure video/Zoom link from the care team.
+
+> 💳 No card details are collected in this prototype.
+> 🎥 No meeting link is fabricated. The care team confirms the real payment and video details after the request.
+
 ## 🧪 Quality checklist
 
 - [x] TypeScript validation with `npm run lint`
@@ -179,6 +252,10 @@ The repository already includes `netlify.toml`, so Netlify can use the defaults:
 - [x] Mobile-first responsive layout
 - [x] No copied Embrayo runtime dependencies
 - [x] No external health-data service required for the prototype
+- [x] WhatsApp and telephone actions use the provided care number
+- [x] Map and delivery actions open external search safely
+- [x] Booking requests include selected session, date, and time
+- [x] Payment/video flow avoids collecting sensitive details in the prototype
 
 ## ⚕️ Safety and scope
 
