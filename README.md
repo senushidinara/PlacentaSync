@@ -1,32 +1,68 @@
-# PlacentaSync
+<div align="center">
 
-PlacentaSync is a standalone, mobile-first maternal care companion. It gives expectant parents a calm place to record how they feel, notice symptoms, practice a one-minute breathing exercise, and reach their care team.
+# 🌿 PlacentaSync
 
-This repository is intentionally independent from the original Embrayo project. It contains only the PlacentaSync client and its deployment configuration.
+### A softer way to check in with you. 💛
 
-## What is included
+<p>
+  <strong>PlacentaSync</strong> is a calm, mobile-first maternal care companion for daily check-ins,
+  breathing support, care-plan prompts, and care-team communication.
+</p>
 
-- Daily mood and symptom check-in
-- One-minute “Breathe with baby” exercise
-- Weekly baby note and care-plan prompts
-- Care-team and urgent-help entry points
-- Responsive React interface for phone, tablet, and desktop
-- Netlify SPA deployment configuration
+<p>
+  <a href="https://github.com/senushidinara/PlacentaSync">
+    <img src="https://img.shields.io/badge/GitHub-Source%20code-2f6260?style=for-the-badge&logo=github&logoColor=white" alt="GitHub source code">
+  </a>
+  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/senushidinara/PlacentaSync">
+    <img src="https://img.shields.io/badge/Netlify-Deploy%20your%20copy-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" alt="Deploy to Netlify">
+  </a>
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=20232A" alt="React 19">
+  <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+</p>
 
-PlacentaSync is a support and communication tool, not a medical diagnosis. Urgent symptoms should always be discussed with a clinician or local emergency services.
+</div>
 
-## Local development
+<p align="center">
+  <img src="./public/placenta-sync-preview.svg" alt="PlacentaSync care companion preview" width="900">
+</p>
 
-Requirements: Node.js 18+ and npm.
+## ✨ What it does
+
+PlacentaSync turns a daily health moment into a gentle, structured ritual:
+
+- 🌤️ **Daily check-in** — capture mood and body symptoms without judgment.
+- 🌬️ **Breathe with baby** — start a simple one-minute breathing rhythm.
+- 👶 **Baby’s little note** — receive a warm, week-aware encouragement.
+- 🛡️ **Care plan** — keep the next small actions visible.
+- 💬 **Care team** — create a clear path to ask for support.
+- ☎️ **Urgent help** — keep emergency guidance easy to find.
+- 📱 **Responsive by design** — comfortable on phones, tablets, and desktops.
+
+> ⚕️ PlacentaSync is a support and communication tool, not a medical diagnosis. For urgent symptoms, contact a clinician or local emergency services.
+
+## 🧭 Product flow
+
+```mermaid
+flowchart LR
+    A[🌅 Open today's check-in] --> B[💛 Choose how you feel]
+    B --> C[🩺 Notice symptoms]
+    C --> D[✅ Save your check-in]
+    D --> E[🌬️ Breathe with baby]
+    E --> F[💬 Reach your care team]
+```
+
+## 🚀 Run it locally
+
+**Requirements:** Node.js 18+ and npm.
 
 ```bash
+git clone https://github.com/senushidinara/PlacentaSync.git
+cd PlacentaSync
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite.
-
-## Production build
+For a production build:
 
 ```bash
 npm run lint
@@ -34,16 +70,32 @@ npm run build
 npm run preview
 ```
 
-## Netlify
+## 🌐 Netlify
 
-The included `netlify.toml` configures:
+The repository includes a ready-to-use `netlify.toml`:
 
-- Build command: `npm run build`
-- Publish directory: `dist`
-- SPA fallback: all routes serve `index.html`
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+| SPA fallback | `/* → /index.html` |
 
-Import `senushidinara/PlacentaSync` into Netlify and use the default settings from `netlify.toml`. No secrets or external services are required for the current client-only prototype.
+### Deploy it in one click
 
-## License
+<a href="https://app.netlify.com/start/deploy?repository=https://github.com/senushidinara/PlacentaSync">
+  <img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify">
+</a>
+
+After deployment, Netlify will provide the live URL for your site. The current repository does not yet have a verified Netlify site URL connected to it, so this README intentionally avoids publishing an unverified link.
+
+## 🧱 Built with
+
+⚛️ React · 🟦 TypeScript · ⚡ Vite · 🎨 Tailwind CSS · 🧩 Lucide React · 🌐 Netlify
+
+## 🔒 Privacy-minded prototype
+
+The current version is a client-only prototype. It does not require Firebase, PostgreSQL, Gemini, or a backend service, and it does not collect or transmit health data by itself.
+
+## 📄 License
 
 MIT
