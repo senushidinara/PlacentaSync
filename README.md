@@ -175,3 +175,28 @@ sequenceDiagram
 
 ## 📄 License
 This project is open source and available under the MIT License.
+# PlacentaSync
+
+A gentle maternal care companion for daily check-ins, breathing support, care plans, and care-team communication.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+## Deploy to Netlify
+
+This repository includes `netlify.toml`. Netlify will use:
+
+- **Build command:** `npm run build:client`
+- **Publish directory:** `dist`
+
+The SPA redirect keeps client-side routes working on refresh.
+
+```bash
+npm run build:client
+```
+
+The generated `dist/` directory can be previewed with `npm run preview`.
