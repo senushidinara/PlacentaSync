@@ -22,6 +22,7 @@
   <a href="#-the-care-loop">Care loop</a> ·
   <a href="#-features">Features</a> ·
   <a href="#-run-it">Run it</a> ·
+  <a href="#-paypal-sandbox-checkout">PayPal Sandbox</a> ·
   <a href="#-faq">FAQ</a>
 </p>
 
@@ -38,12 +39,6 @@
 </p>
 
 <p align="center">
-  <a href="https://6aec42d2b1ff41fd8e61c97f--earnest-speculoos-a3c583.netlify.app/">
-    <img src="https://img.shields.io/badge/Try%20it%20out-Live%20demo-2F6260?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Try PlacentaSync live">
-  </a>
-</p>
-
-<p align="center">
   <img src="./public/placenta-sync-explore.png" alt="PlacentaSync nearby care and nutrition access screen screenshot" width="900">
 </p>
 
@@ -56,7 +51,7 @@
 | 🌤️ Today | Mood, symptom, breathing, nearby-care, booking, and urgent-help actions |
 | 📚 Learn | Expand maternal education lessons and mark them as learned |
 | 📍 Explore | Open nearby map searches for maternity hospitals, clinics, and nutrition shops |
-| 🗓️ Sessions | Select a session, date, and time, then hand off booking/payment through WhatsApp |
+| 🗓️ Sessions | Select a session, date, and time, then pay in PayPal Sandbox or hand off through WhatsApp |
 | 💬 Care team | Open WhatsApp, call the care number, or save a message |
 
 </details>
@@ -148,12 +143,13 @@ flowchart LR
   🟦 TypeScript &nbsp;·&nbsp;
   ⚡ Vite &nbsp;·&nbsp;
   🎨 Tailwind CSS &nbsp;·&nbsp;
-  🧩 Lucide React
+  🧩 Lucide React &nbsp;·&nbsp;
+  💳 PayPal JavaScript SDK (Sandbox)
 </p>
 
-This is a **standalone client-only prototype**. It does not depend on the original Embrayo project and does not require Firebase, PostgreSQL, Gemini, or an Express server.
+PlacentaSync is a working client-side web app and public demo. It does not depend on the original Embrayo project and does not require Firebase, PostgreSQL, Gemini, or an Express server.
 
-The app is intentionally built around **safe handoffs**: maps open trusted external search, WhatsApp opens the provided care number, and payment/video details are confirmed by the care team instead of collecting card details or inventing a meeting link inside the prototype.
+The app is intentionally built around **safe handoffs**: maps open trusted external search, WhatsApp opens the provided care number, and PayPal handles the sandbox checkout without exposing card details to this app.
 
 ## 💻 Run it
 
@@ -188,15 +184,20 @@ npm run preview
 
 ## 🚀 Try it out
 
-Experience the live PlacentaSync prototype here:
+Run the working demo locally with the setup instructions above. For the best experience, open it on a phone-sized screen or in a modern mobile browser.
 
-<p align="center">
-  <a href="https://6aec42d2b1ff41fd8e61c97f--earnest-speculoos-a3c583.netlify.app/">
-    <strong>🌿 Open the live PlacentaSync demo →</strong>
-  </a>
-</p>
+## 💳 PayPal Sandbox checkout
 
-> The live demo is a client-only prototype. For the best experience, open it on a phone-sized screen or in a modern mobile browser.
+PayPal is central to the session-booking flow. The Sessions tab renders PayPal's official JavaScript SDK with the free sandbox client ID (`client-id=test`) and a **$15.00 USD** test purchase for each maternal education session.
+
+To try it:
+
+1. Run the app locally using the setup instructions above.
+2. Open **Sessions**, choose a session, and select a date and time.
+3. Use the PayPal button in the booking dialog.
+4. Complete the transaction with a PayPal Sandbox buyer account, then confirm the success message.
+
+The WhatsApp booking handoff remains available as a fallback. This is intentionally a sandbox-only client integration for judging and development; a production deployment must create and capture orders on a trusted server and use a production PayPal client ID.
 
 ## 📲 Care access and booking
 
@@ -230,10 +231,10 @@ The Sessions tab lets someone:
 
 1. Pick **Midwife check-in**, **Nutrition education**, or **Birth preparation**.
 2. Select a preferred date and time.
-3. Use **Book & pay via WhatsApp** to send the request to the care team.
-4. Receive payment instructions and a confirmed secure video/Zoom link from the care team.
+3. **Pay with PayPal Sandbox** for the $15.00 USD test transaction, or use **Book & pay via WhatsApp**.
+4. Receive the booking confirmation and, when using WhatsApp, payment/video instructions from the care team.
 
-> 💳 No card details are collected in this prototype.
+> 💳 Card details are handled by PayPal and are not collected by PlacentaSync.
 > 🎥 No meeting link is fabricated. The care team confirms the real payment and video details after the request.
 
 ## 🧪 Quality checklist
@@ -246,7 +247,9 @@ The Sessions tab lets someone:
 - [x] WhatsApp and telephone actions use the provided care number
 - [x] Map and delivery actions open external search safely
 - [x] Booking requests include selected session, date, and time
-- [x] Payment/video flow avoids collecting sensitive details in the prototype
+- [x] PayPal JavaScript SDK Sandbox checkout is available for $15.00 USD
+- [x] PayPal checkout success and failure states are surfaced in the UI
+- [x] Card details are handled by PayPal rather than collected by the app
 
 ## ⚕️ Safety and scope
 
@@ -290,7 +293,7 @@ The current prototype uses a focused set of mood and symptom options. The UI is 
 <summary><strong>Where can I try PlacentaSync?</strong></summary>
 <br>
 
-The live prototype is available at the [PlacentaSync demo](https://6aec42d2b1ff41fd8e61c97f--earnest-speculoos-a3c583.netlify.app/).
+The working demo can be run locally using the setup instructions in this README.
 
 </details>
 
@@ -305,7 +308,7 @@ Ideas, accessibility feedback, and thoughtful UI improvements are welcome:
 
 ## 📄 License
 
-MIT
+PlacentaSync is open source under the [MIT License](./LICENSE).
 
 <div align="center">
 
