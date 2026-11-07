@@ -6,6 +6,30 @@ import {
   ShieldCheck, ShoppingBag, Sparkles, Stethoscope, Sun, Video, WalletCards, Wind, X,
 } from 'lucide-react';
 
+type PayPalOrderActions = {
+  order: {
+    create: (order: { purchase_units: Array<{ description: string; amount: { value: string; currency_code: string } }> }) => Promise<string>;
+    capture: () => Promise<{ payer?: { name?: { given_name?: string } } }>;
+  };
+};
+
+type PayPalButtonsInstance = {
+  render: (container: string) => Promise<void>;
+  close?: () => Promise<void>;
+};
+
+declare global {
+  interface Window {
+    paypal?: {
+      Buttons: (options: {
+        createOrder: (_data: unknown, actions: PayPalOrderActions) => Promise<string>;
+        onApprove: (_data: unknown, actions: PayPalOrderActions) => Promise<void>;
+        onError?: (error: unknown) => void;
+      }) => PayPalButtonsInstance;
+    };
+  }
+}
+
 type Tab = 'Today' | 'Learn' | 'Journal' | 'Care team' | 'Explore' | 'Sessions';
 const WHATSAPP = '94777959386';
 const whatsapp = (text: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
@@ -94,9 +118,55 @@ function Explore({ setUrgent }: { setUrgent: (value: boolean) => void }) {
   return <><section className="mt-3 rounded-[30px] bg-[#eef6f7] px-6 py-8 sm:px-10 sm:py-10"><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-[#5d9c9b]"><MapPin size={14} /> Care access map</p><h1 className="mt-4 text-[31px] font-bold leading-tight tracking-[-.06em] text-[#315b5e] sm:text-[43px]">Care is more than<br /><span className="text-[#df7967]">one appointment.</span></h1><p className="mt-4 max-w-[580px] text-[13px] leading-relaxed text-[#668486]">Find nearby support, then choose the kind of help that fits this moment.</p><button onClick={() => setLocation(true)} className="mt-6 flex items-center gap-2 rounded-xl bg-[#2f6260] px-4 py-3 text-xs font-bold text-white"><Navigation size={14} /> {location ? 'Location enabled' : 'Use my location'}</button></section><div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-3">{places.map((place) => { const Icon = place.icon; return <article key={place.type} className="rounded-[22px] border border-[#eee5de] bg-white p-5"><div className={`grid h-11 w-11 place-items-center rounded-2xl ${place.color}`}><Icon size={20} /></div><p className="mt-5 text-[9px] font-bold uppercase tracking-[.16em] text-[#a4aaa4]">{place.type}</p><h2 className="mt-2 text-[15px] font-bold">{place.name}</h2><p className="mt-2 text-[11px] leading-relaxed text-[#8c9994]">{place.detail}</p><div className="mt-5 flex gap-2"><a href={maps(place.query)} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-[#eff8f4] py-2.5 text-[10px] font-bold text-[#397866]"><MapPin size={13} /> Map</a><a href={whatsapp(`Hi PlacentaSync, I need help finding ${place.type.toLowerCase()} support.`)} target="_blank" rel="noreferrer" className="grid w-10 place-items-center rounded-xl bg-[#eaf6ef] text-[#397866]"><MessageCircle size={14} /></a></div></article>; })}</div><section className="mt-5 rounded-[22px] border border-[#f4d9d2] bg-[#fff8f4] p-5"><div className="flex gap-3"><ShoppingBag size={19} className="shrink-0 text-[#df7967]" /><div><h2 className="text-[14px] font-bold text-[#704f4a]">Nutrition delivery shortcuts</h2><p className="mt-1 text-[11px] leading-relaxed text-[#98746d]">Search local supplement shops and delivery options. Always check new supplements with your clinician first.</p><div className="mt-4 flex flex-wrap gap-2"><a href={maps('prenatal vitamins delivery near me')} target="_blank" rel="noreferrer" className="rounded-xl bg-white px-3 py-2 text-[10px] font-bold text-[#c76456]">Find supplements <ExternalLink size={12} className="ml-1 inline" /></a><a href={maps('healthy food delivery near me')} target="_blank" rel="noreferrer" className="rounded-xl bg-white px-3 py-2 text-[10px] font-bold text-[#c76456]">Find food delivery <ExternalLink size={12} className="ml-1 inline" /></a></div></div></div></section><Safety /></>;
 }
 
+function PayPalCheckout({ amount, description, onSuccess }: { amount: string; description: string; onSuccess: (name: string) => void }) {
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    let buttons: PayPalButtonsInstance | undefined;
+
+    const renderButtons = async () => {
+      for (let attempt = 0; attempt < 20 && !window.paypal && !cancelled; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+      }
+      if (cancelled) return;
+      if (!window.paypal) {
+        setError('PayPal could not load. Please use WhatsApp to request payment instead.');
+        return;
+      }
+
+      buttons = window.paypal.Buttons({
+        createOrder: (_data, actions) => actions.order.create({
+          purchase_units: [{ description, amount: { value: amount, currency_code: 'USD' } }],
+        }),
+        onApprove: async (_data, actions) => {
+          const orderData = await actions.order.capture();
+          onSuccess(orderData.payer?.name?.given_name || 'there');
+        },
+        onError: () => setError('PayPal could not complete this payment. Please try again or use WhatsApp.'),
+      });
+
+      try {
+        await buttons.render('#paypal-button-container');
+      } catch {
+        if (!cancelled) setError('PayPal could not load. Please use WhatsApp to request payment instead.');
+      }
+    };
+
+    renderButtons();
+    return () => {
+      cancelled = true;
+      void buttons?.close?.();
+    };
+  }, [amount, description, onSuccess]);
+
+  return <div className="mt-5 rounded-2xl border border-[#eee5de] bg-[#fffaf6] p-4"><div className="flex items-center gap-2 text-[11px] font-bold text-[#4f7169]"><WalletCards size={15} className="text-[#5e9882]" />Pay securely with PayPal Sandbox</div><div id="paypal-button-container" className="mt-3 min-h-10" />{error && <p className="mt-2 text-[10px] leading-relaxed text-[#bd6b5d]">{error}</p>}</div>;
+}
+
 function Sessions({ booking, setBooking, bookingDate, setBookingDate, bookingTime, setBookingTime, bookingType, setBookingType, bookingSent, setBookingSent }: any) {
   const confirmBooking = () => { setBookingSent(true); setBooking(false); };
-  return <><section className="mt-3 rounded-[30px] bg-[#fff0e8] px-6 py-8 sm:px-10 sm:py-10"><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-[#bd806d]"><CalendarDays size={14} /> Maternal education sessions</p><h1 className="mt-4 text-[31px] font-bold leading-tight tracking-[-.06em] text-[#704f4a] sm:text-[43px]">Book time for<br /><span className="text-[#df7967]">your questions.</span></h1><p className="mt-4 max-w-[560px] text-[13px] leading-relaxed text-[#98746d]">Choose a session, request a time, and the care team will confirm the secure meeting details with you.</p></section><section className="mt-6 rounded-[24px] border border-[#eee5de] bg-white p-5 sm:p-7"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#a4aaa4]">Available sessions</p><h2 className="mt-2 text-xl font-bold">Personalised support</h2></div>{bookingSent && <span className="rounded-full bg-[#eaf6ef] px-3 py-2 text-[10px] font-bold text-[#5e9882]"><Check size={12} className="mr-1 inline" />Request sent</span>}</div><div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">{[['Midwife check-in', '20 min', 'Questions, symptoms, next steps', MessageCircle], ['Nutrition education', '30 min', 'Supplements, hydration, meal ideas', ShoppingBag], ['Birth preparation', '45 min', 'Preferences, support, confidence', Baby]].map(([title, time, detail, Icon]) => <button key={title as string} onClick={() => { setBookingType(title as string); setBooking(true); }} className="rounded-2xl border border-[#eee5de] p-4 text-left transition hover:border-[#9bcdbb] hover:bg-[#fbfffc]"><div className="flex items-center justify-between"><div className="grid h-9 w-9 place-items-center rounded-xl bg-[#eff8f4] text-[#5e9882]">{typeof Icon === 'function' && <Icon size={16} />}</div><ArrowRight size={15} className="text-[#a4aaa4]" /></div><h3 className="mt-4 text-[13px] font-bold">{title as string}</h3><p className="mt-1 text-[10px] text-[#8c9994]">{detail as string}</p><p className="mt-3 flex items-center gap-1 text-[10px] font-bold text-[#5e9882]"><Clock3 size={12} /> {time as string}</p></button>)}</div></section>{booking && <div className="fixed inset-0 z-50 grid place-items-center bg-[#24363a]/35 p-5"><div className="w-full max-w-lg rounded-[26px] bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#a4aaa4]">Request a session</p><h2 className="mt-2 text-xl font-bold">{bookingType}</h2></div><button onClick={() => setBooking(false)}><X size={18} /></button></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><label className="text-[11px] font-bold text-[#71807b]">Preferred date<input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="mt-2 block w-full rounded-xl border border-[#eee5de] p-3 text-sm" /></label><label className="text-[11px] font-bold text-[#71807b]">Preferred time<select value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="mt-2 block w-full rounded-xl border border-[#eee5de] p-3 text-sm"><option>09:00</option><option>10:00</option><option>14:00</option><option>16:00</option></select></label></div><div className="mt-5 rounded-2xl bg-[#eff8f4] p-4 text-[11px] leading-relaxed text-[#4f7169]"><Video size={16} className="mr-2 inline text-[#5e9882]" />The care team will confirm whether this is a video call and send the secure meeting link through WhatsApp.</div><div className="mt-5 grid gap-2 sm:grid-cols-2"><a href={whatsapp(`Hi, I would like to book and pay for a ${bookingType} on ${bookingDate} at ${bookingTime}. Please send the secure payment and meeting details.`)} target="_blank" rel="noreferrer" onClick={confirmBooking} className="flex items-center justify-center gap-2 rounded-xl bg-[#2f6260] py-3 text-xs font-bold text-white"><WalletCards size={14} /> Book & pay via WhatsApp</a><button onClick={() => setBooking(false)} className="rounded-xl border border-[#eee5de] py-3 text-xs font-bold text-[#71807b]">Choose later</button></div><p className="mt-4 text-[10px] leading-relaxed text-[#a4aaa4]">Payment and video links are handled by your care team; no card details are collected in this prototype.</p></div></div>}<Safety /></>;
+  const handlePayPalSuccess = (name: string) => { setBookingSent(true); setBooking(false); window.alert(`Transaction successful! Thank you, ${name}.`); };
+  return <><section className="mt-3 rounded-[30px] bg-[#fff0e8] px-6 py-8 sm:px-10 sm:py-10"><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-[#bd806d]"><CalendarDays size={14} /> Maternal education sessions</p><h1 className="mt-4 text-[31px] font-bold leading-tight tracking-[-.06em] text-[#704f4a] sm:text-[43px]">Book time for<br /><span className="text-[#df7967]">your questions.</span></h1><p className="mt-4 max-w-[560px] text-[13px] leading-relaxed text-[#98746d]">Choose a session, request a time, and the care team will confirm the secure meeting details with you.</p></section><section className="mt-6 rounded-[24px] border border-[#eee5de] bg-white p-5 sm:p-7"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#a4aaa4]">Available sessions</p><h2 className="mt-2 text-xl font-bold">Personalised support</h2></div>{bookingSent && <span className="rounded-full bg-[#eaf6ef] px-3 py-2 text-[10px] font-bold text-[#5e9882]"><Check size={12} className="mr-1 inline" />Request sent</span>}</div><div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">{[['Midwife check-in', '20 min', 'Questions, symptoms, next steps', MessageCircle], ['Nutrition education', '30 min', 'Supplements, hydration, meal ideas', ShoppingBag], ['Birth preparation', '45 min', 'Preferences, support, confidence', Baby]].map(([title, time, detail, Icon]) => <button key={title as string} onClick={() => { setBookingType(title as string); setBooking(true); }} className="rounded-2xl border border-[#eee5de] p-4 text-left transition hover:border-[#9bcdbb] hover:bg-[#fbfffc]"><div className="flex items-center justify-between"><div className="grid h-9 w-9 place-items-center rounded-xl bg-[#eff8f4] text-[#5e9882]">{typeof Icon === 'function' && <Icon size={16} />}</div><ArrowRight size={15} className="text-[#a4aaa4]" /></div><h3 className="mt-4 text-[13px] font-bold">{title as string}</h3><p className="mt-1 text-[10px] text-[#8c9994]">{detail as string}</p><p className="mt-3 flex items-center gap-1 text-[10px] font-bold text-[#5e9882]"><Clock3 size={12} /> {time as string}</p></button>)}</div></section>{booking && <div className="fixed inset-0 z-50 grid place-items-center bg-[#24363a]/35 p-5"><div className="w-full max-w-lg rounded-[26px] bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#a4aaa4]">Request a session</p><h2 className="mt-2 text-xl font-bold">{bookingType}</h2></div><button onClick={() => setBooking(false)}><X size={18} /></button></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><label className="text-[11px] font-bold text-[#71807b]">Preferred date<input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="mt-2 block w-full rounded-xl border border-[#eee5de] p-3 text-sm" /></label><label className="text-[11px] font-bold text-[#71807b]">Preferred time<select value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="mt-2 block w-full rounded-xl border border-[#eee5de] p-3 text-sm"><option>09:00</option><option>10:00</option><option>14:00</option><option>16:00</option></select></label></div><div className="mt-5 rounded-2xl bg-[#eff8f4] p-4 text-[11px] leading-relaxed text-[#4f7169]"><Video size={16} className="mr-2 inline text-[#5e9882]" />The care team will confirm whether this is a video call and send the secure meeting link through WhatsApp.</div><PayPalCheckout amount="15.00" description={bookingType} onSuccess={handlePayPalSuccess} /><div className="mt-5 grid gap-2 sm:grid-cols-2"><a href={whatsapp(`Hi, I would like to book and pay for a ${bookingType} on ${bookingDate} at ${bookingTime}. Please send the secure payment and meeting details.`)} target="_blank" rel="noreferrer" onClick={confirmBooking} className="flex items-center justify-center gap-2 rounded-xl bg-[#2f6260] py-3 text-xs font-bold text-white"><WalletCards size={14} /> Book & pay via WhatsApp</a><button onClick={() => setBooking(false)} className="rounded-xl border border-[#eee5de] py-3 text-xs font-bold text-[#71807b]">Choose later</button></div><p className="mt-4 text-[10px] leading-relaxed text-[#a4aaa4]">Payment and video links are handled by your care team; no card details are collected in this prototype.</p></div></div>}<Safety /></>;
 }
 
 function Journal({ journal, setJournal, savedJournal, setSavedJournal }: any) {
